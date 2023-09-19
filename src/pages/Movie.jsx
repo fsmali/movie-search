@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import '../styles/input.css'
 
 const Movie = () => {
   const [data, setData] = useState([]);
@@ -10,7 +11,7 @@ const Movie = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
-    navigate('/login');
+    navigate('/movie');
   };
 
   const fetchData = async (searchQuery = '') => {
@@ -42,6 +43,7 @@ const Movie = () => {
       <div className="container">
         <div className="search-bar">
           <input
+          className='input'
             type="text"
             placeholder="Search for a movie by name"
             value={search}
