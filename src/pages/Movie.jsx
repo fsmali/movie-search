@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { DATA } from '../data';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const Movie = () => {
   const [data, setData] = useState([]);
@@ -10,14 +10,16 @@ const Movie = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('isLoggedIn');
-
     navigate('/login');
   };
-  const fetchData = async () => {
+
+  const fetchData = async (searchQuery = '') => {
     try {
-      const response = await axios.get(DATA);
+      const response = await axios.get(
+        `https://api.themoviedb.org/3/search/movie?api_key=19f3d4d7159e523efbbbf49ec8bc328f&include_adult=false&language=en-US&page=1&query=${searchQuery}`
+      );
       const { data } = response;
-      // console.log(data);
+      console.log(data);
       setData(data);
     } catch (error) {
       console.error(error);
@@ -25,22 +27,11 @@ const Movie = () => {
   };
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    fetchData(search); 
+  }, [search]);
 
-  const handleSearch = () => {
-    if (search === '') {
-      fetchData();
-    } else {
-      const filteredMovies = data.results.filter((movie) =>
-        movie.title.toLowerCase().includes(search.toLowerCase())
-      );
-
-      setData((prevData) => ({
-        ...prevData,
-        results: filteredMovies,
-      }));
-    }
+  const handleSearch = (e) => {
+    setSearch(e.target.value);
   };
 
   return (
@@ -54,9 +45,8 @@ const Movie = () => {
             type="text"
             placeholder="Search for a movie by name"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={handleSearch}
           />
-          <button onClick={handleSearch}>Search</button>
         </div>
 
         <ul className="movie-ul">
@@ -64,17 +54,14 @@ const Movie = () => {
             data.results.map((movie) => (
               <li className="movie-li" key={movie.id}>
                 <h2>{movie.title}</h2>
-{movie.poster_path&&  <img
-                  src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                  alt={`Poster for ${movie.title}`}
-                />
 
-
-}
-              
-
-                <p>{movie.release_date}</p>
-                <p>{movie.overview}</p>
+                {movie.poster_path && (
+                  <img
+                    src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                    alt={`Poster for ${movie.title}`}
+                  />
+                )}
+                <Link to={`/movie/${movie.id}`}>See more detail</Link>
               </li>
             ))}
         </ul>
